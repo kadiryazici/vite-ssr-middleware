@@ -20,7 +20,7 @@ Third parameter is optional object, which can be defined in root handler `object
 
 Every middleware has to return `boolean`. If middleware returns `true` chaining will continue.<br>
 If middleware returns `false` chaining will stop.<br>
-Return `false` to use `next()` and `redirect()` inside middlewares. If returned value is `true` and `next()` or `redirect()` used `vue-router` will throw error.
+Return `false` to use `next()` and `redirect()` inside middlewares. If returned value is `true` and `next()` or `redirect()` is used `vue-router` will throw error.
 
 ```ts
 import { defineMiddleware } from 'vite-ssr-middleware';
