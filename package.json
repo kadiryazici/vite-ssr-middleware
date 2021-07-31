@@ -1,0 +1,43 @@
+{
+   "name": "vite-ssr-middleware",
+   "version": "0.1.0",
+   "description": "\"Middleware support for plugin vite-ssr\"",
+   "types": "./dist/types/index.d.ts",
+   "main": "./dist/cjs/index.js",
+   "module": "./dist/esm/index.js",
+   "exports": {
+      ".": {
+         "import": "./dist/esm/index.js",
+         "require": "./dist/cjs/index.js"
+      }
+   },
+   "scripts": {
+      "build:cjs": "tsc --project tsconfig-cjs.json",
+      "build:esm": "tsc --project tsconfig-esm.json",
+      "build:types": "tsc --project tsconfig.json --declaration --declarationDir \"./dist/types\"  --emitDeclarationOnly",
+      "build": "rimraf dist && mkdir dist && npm run build:cjs && npm run build:esm && npm run build:types"
+   },
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/kadiryazici/vite-ssr-middleware.git"
+   },
+   "keywords": [
+      "vite-ssr",
+      "middleware"
+   ],
+   "author": "Kadir Yazıcı",
+   "license": "MIT",
+   "bugs": {
+      "url": "https://github.com/kadiryazici/vite-ssr-middleware/issues"
+   },
+   "homepage": "https://github.com/kadiryazici/vite-ssr-middleware#readme",
+   "devDependencies": {
+      "rimraf": "^3.0.2",
+      "vite-ssr": "^0.12.0",
+      "vue-router": "^4.0.10"
+   },
+   "peerDependencies": {
+      "vite-ssr": "^0.12.0",
+      "vue-router": "^4.0.10"
+   }
+}
