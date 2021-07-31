@@ -181,8 +181,8 @@ const routes = [
 
 ### Vite Plugin Pages Example
 
-If you are using [vite-plugin-pages](https://github.com/hannoeru/vite-plugin-pages) you cannot import middlewares and directly use them.<br>
-But this library supports names of middleware so we can use thme with the plugin.
+If you are using [vite-plugin-pages](https://github.com/hannoeru/vite-plugin-pages) we cannot import middlewares and directly use them.<br>
+But this library supports name of middlewares so we can use them.
 
 ```html
 <!-- I have to use prettier-ignore thanks to prettier :) -->
