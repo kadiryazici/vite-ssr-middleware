@@ -26,7 +26,7 @@ Return `false` to use `next()` and `redirect()` inside middlewares. If returned 
 import { defineMiddleware } from 'vite-ssr-middleware';
 import { useStore } from '../stores/mainStore';
 
-//context is Vite-SSR contex. Simply return type of useContext() from vite-ssr.
+// context is Vite-SSR context. Simply return type of useContext() from vite-ssr.
 // Properties are empty object by default and can be customized in root handler.
 export const authMiddleware = defineMiddleware(
    'auth',
@@ -111,8 +111,8 @@ export default viteSSR(App, { routes }, (context) => {
 ### A Little Complex Handler
 
 This handler is to create a handler function. Handler function will return `true` or `false`.<br><br>
-If handler function returns `true` it means a middleware returned `false`,<br>
-in this tutorial if `false` is returned it means `next()` or `redirect()` is called. You can use it for your own purpose<br><br>
+If handler function returns `true` it means a middleware returned `false` and blocked chaining.<br>
+Basically in this tutorial if `false` is returned from middleware it means `next()` or `redirect()` is called. You can use it for your own purpose<br><br>
 If handler returns `false` it means none of middlewares called `next()`, so we have to call it manually.
 
 ```ts
