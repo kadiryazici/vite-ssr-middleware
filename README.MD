@@ -181,7 +181,7 @@ const routes = [
 
 ### Importing Middlewares Dynamically
 
-Thanks to vite's `import.meta.globEager` function we can import files inside a directory so won't import middlewares by hand.
+Thanks to vite's `import.meta.globEager` function we can import files inside a directory so we won't import middlewares by hand.
 
 I am assuming that we have a directory called `middlewares` and every file inside of this folder has `default` export which is middleware.<br>
 Check: [Glob Import](https://vitejs.dev/guide/features.html#glob-import)
