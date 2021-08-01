@@ -9,8 +9,7 @@
       "resolveJsonModule": true,
       "skipLibCheck": true,
       "baseUrl": ".",
-      "rootDir": "./src",
-      "removeComments": true
+      "rootDir": "./src"
    },
    "include": ["./src/**/*"],
    "exclude": ["**/dist", "**/node_modules"]
