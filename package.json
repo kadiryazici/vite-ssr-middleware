@@ -16,7 +16,7 @@
       "build:esm": "tsc --project tsconfig-esm.json",
       "build:types": "tsc --project tsconfig.json --declaration --declarationDir \"./dist/types\"  --emitDeclarationOnly",
       "build": "rimraf dist && mkdir dist && npm run build:cjs && npm run build:esm && npm run build:types",
-      "prepublish": "npm build"
+      "prepare": "npm run build"
    },
    "repository": {
       "type": "git",
