@@ -179,6 +179,56 @@ const routes = [
 ];
 ```
 
+### Importing Middlewares Dynamically
+
+Thanks to vite's `import.meta.globEager` function we can import files inside a directory so won't import middlewares by hand.
+
+I am assuming that we have a directory called `middlewares` and every file inside of this folder has `default` export which is middleware.<br>
+Check: [Glob Import](https://vitejs.dev/guide/features.html#glob-import)
+
+```ts
+import { viteSSR } from 'vite-ssr/vue';
+import { middlewareHandler, Middleware } from 'vite-ssr-middleware';
+import App from './App.vue';
+import { routes } from './routes';
+import type { Middleware } from 'vite-ssr-middleware';
+
+export default viteSSR(App, { routes }, (context) => {
+   const { router } = context;
+
+   // glob import will return an object of imports.
+   // key is path and value is exported data.
+   /**
+    * Example: {
+    *    './middlewares/authMiddleware.ts': {
+    *       default: middlewareData,
+    *    },
+    *    './middlewares/loggerMiddleware.ts': {
+    *       default: loggerMiddlewareData,
+    *    },
+    * }
+    */
+   const midwareGlob = import.meta.globEager('./middlewares/*.ts');
+   const middlewares: Middleware[] = Object.keys(midwareGlob).map(
+      (key) => midwareGlob[key].default
+   );
+   const handler = middlewareHandler(context, middlewares);
+   router.beforeEach(handler);
+});
+```
+
+##### authMiddleware.ts
+
+```ts
+export default defineMiddleware('auth', () => true);
+```
+
+##### loggerMiddleware.ts
+
+```ts
+export default defineMiddleware('logger', () => true);
+```
+
 ### Vite Plugin Pages Example
 
 If you are using [vite-plugin-pages](https://github.com/hannoeru/vite-plugin-pages) we cannot import middlewares and directly use them.<br>

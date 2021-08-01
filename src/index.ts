@@ -15,12 +15,12 @@ type Callback = (
    properties: CustomProperties
 ) => boolean | Promise<boolean>;
 
-type Middleware = {
+export type Middleware = {
    name: string;
    handler: Callback;
 };
 
-type MiddlewareRecord = (string | Middleware)[];
+export type MiddlewareRecord = (string | Middleware)[];
 type CustomProperties = Record<any, any> | {};
 
 /**
