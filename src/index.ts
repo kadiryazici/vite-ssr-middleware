@@ -9,7 +9,6 @@ type RouterGuard = {
 };
 
 type CallbackParameters = RouterGuard;
-
 type Callback = (
    params: ViteSSRContext & RouterGuard,
    properties: CustomProperties
@@ -21,7 +20,7 @@ export type Middleware = {
 };
 
 export type MiddlewareRecord = (string | Middleware)[];
-type CustomProperties = Record<any, any> | {};
+export type CustomProperties = Record<any, any>;
 
 /**
  * 
