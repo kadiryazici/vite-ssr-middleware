@@ -16,7 +16,6 @@ Usage is simple, there is no need to register this package like `vueApp.use()`.
 A middleware can have 3 arguments, 2 of them are necessary and 1 is optional.<br>
 First parameter is unique name to middleware `string`<br>
 Second parameter is handler `(context, properties) => boolean | Promise<boolean>`<br>
-Third parameter is optional object, which can be defined in root handler `object`
 
 Every middleware has to return `boolean`. If middleware returns `true` chaining will continue.<br>
 If middleware returns `false` chaining will stop.<br>
