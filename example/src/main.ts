@@ -37,10 +37,12 @@ export default viteSSR(App, { routes }, (context) => {
    }
 
    //importing middlewares
-   const middlewares: Middleware[] = Object.keys(middlewareGlob).map(
-      (key) => middlewareGlob[key].default
+   const middlewares: Middleware[] = Object.keys(middlewareGlob).map((key) => middlewareGlob[key].default);
+   router.beforeEach(
+      middlewareHandler(context, middlewares, {
+         secretValue: 'hello my friend'
+      })
    );
-   router.beforeEach(middlewareHandler(context, middlewares));
    return {
       head
    };
