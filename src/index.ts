@@ -1,26 +1,26 @@
-import { useContext } from 'vite-ssr/vue/';
+import { useContext, Context } from 'vite-ssr/vue/';
 import { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
 
-type ViteSSRContext = ReturnType<typeof useContext>;
-type RouterGuard = {
+interface ViteSSRContext extends Context {}
+interface RouterGuard {
    to: RouteLocationNormalized;
    from: RouteLocationNormalized;
    next: NavigationGuardNext;
-};
+}
 
-type CallbackParameters = RouterGuard;
-type Callback = (
-   params: ViteSSRContext & RouterGuard,
-   properties: CustomProperties
-) => boolean | Promise<boolean>;
-
-export type Middleware = {
+interface HandlerParameters extends RouterGuard {}
+interface MiddlewareHandler {
+   (params: ViteSSRContext & RouterGuard, properties: CustomProperties): boolean | Promise<boolean>;
+}
+export interface Middleware {
    name: string;
-   handler: Callback;
-};
+   handler: MiddlewareHandler;
+}
 
 export type MiddlewareRecord = (string | Middleware)[];
-export type CustomProperties = Record<any, any>;
+export interface CustomProperties {
+   [key: string]: any;
+}
 
 /**
  * 
@@ -32,7 +32,7 @@ export type CustomProperties = Record<any, any>;
    const authMiddleware = defineMiddleware('authMiddleware', (context) => true)
  * ```
  */
-export function defineMiddleware(name: string, fn: Callback): Middleware {
+export function defineMiddleware(name: string, fn: MiddlewareHandler): Middleware {
    return {
       name,
       handler: fn
@@ -59,48 +59,38 @@ export function defineMiddleware(name: string, fn: Callback): Middleware {
 export function createMiddlewareHandler(
    context: ViteSSRContext,
    middlewares: Middleware[],
-   properties: Record<string, any> = {}
-): (params: CallbackParameters) => Promise<boolean> {
-   return async (routerContext) => {
+   properties?: CustomProperties
+) {
+   return async (routerContext: HandlerParameters) => {
       const allContext = {
          ...context,
          ...routerContext
       };
-      const routeMiddlewares = routerContext.to.meta
-         .middlewares as MiddlewareRecord;
+      const routeMiddlewares = routerContext.to.meta.middlewares as MiddlewareRecord;
       if (!routeMiddlewares) {
          return false;
       }
       //@ts-ignore
       const middlewareArray: Middleware[] = routeMiddlewares
          .map((middleware) => {
-            if (typeof middleware === 'string') {
-               return middlewares.find((m) => m.name === middleware);
-            }
-            if (
-               typeof middleware === 'object' &&
-               middleware.name &&
-               typeof middleware.handler === 'function'
-            ) {
+            if (typeof middleware === 'string') return middlewares.find((m) => m.name === middleware);
+
+            if (typeof middleware === 'object' && middleware.name && typeof middleware.handler === 'function')
                return middleware;
-            }
+
             return null;
          })
-         .filter((m) => !!m);
+         .filter(Boolean);
 
       for (let index = 0; index < middlewareArray.length; index++) {
          const middleware = middlewareArray[index];
-         const handler = middleware.handler(allContext, properties);
+         const handler = middleware.handler(allContext, properties || {});
          if (typeof handler === 'boolean') {
-            if (!handler) {
-               return true;
-            }
+            if (!handler) return true;
             continue;
          } else {
             const handlerValue = await handler;
-            if (!handlerValue) {
-               return true;
-            }
+            if (!handlerValue) return true;
             continue;
          }
       }
@@ -120,26 +110,10 @@ export function createMiddlewareHandler(
    })
  * ```
  */
-export function middlewareHandler(
-   context: ViteSSRContext,
-   middlewares: Middleware[],
-   properties: Record<string, any> = {}
-) {
-   return async (
-      to: RouteLocationNormalized,
-      from: RouteLocationNormalized,
-      next: NavigationGuardNext
-   ) => {
-      const middlewareHandler = createMiddlewareHandler(
-         context,
-         middlewares,
-         properties
-      );
-      const isHandled = await middlewareHandler({
-         to,
-         from,
-         next
-      });
+export function middlewareHandler(context: ViteSSRContext, middlewares: Middleware[], properties?: CustomProperties) {
+   return async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+      const middlewareHandler = createMiddlewareHandler(context, middlewares, properties);
+      const isHandled = await middlewareHandler({ to, from, next });
       if (!isHandled) {
          next();
       }

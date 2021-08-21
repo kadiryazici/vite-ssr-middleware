@@ -28,48 +28,45 @@ import { useStore } from '../stores/mainStore';
 
 // context is Vite-SSR context. Simply return type of useContext() from vite-ssr.
 // Properties are empty object by default and can be customized in root handler.
-export const authMiddleware = defineMiddleware(
-   'auth',
-   (context, properties) => {
-      // Vite-SSR 0.12.0 available context values
-      const {
-         next, // from vue-router
-         to, // from vue-router
-         from, // from vue-router
-         isClient,
-         request,
-         redirect,
-         initialState,
-         url,
-         writeResponse,
-         response
-      } = context;
+export const authMiddleware = defineMiddleware('auth', (context, properties) => {
+   // Vite-SSR 0.12.0 available context values
+   const {
+      next, // from vue-router
+      to, // from vue-router
+      from, // from vue-router
+      isClient,
+      request,
+      redirect,
+      initialState,
+      url,
+      writeResponse,
+      response
+   } = context;
 
-      // Check if middleware runs on client side.
-      // import.meta.env.SSR can be used here.
-      if (isClient) {
-         // we are going to talk about this later.
-         const store = useStore(properties.pinia);
-         if (store.auth) return true; // continue chaining
+   // Check if middleware runs on client side.
+   // import.meta.env.SSR can be used here.
+   if (isClient) {
+      // we are going to talk about this later.
+      const store = useStore(properties.pinia);
+      if (store.auth) return true; // continue chaining
 
-         // if user not signed in
-         next('/login');
-         return false; // Stop chaining because NEXT is used.
-      }
-
-      // if not client, it is server
-      const authorization = request.headers.authorization;
-      const isOK = CheckUserTokenAndReturnFalseOrTrue(authorization);
-      if (isOk) return true; // token is correct, return true to continue chaining
-
-      // In server side we have to use redirect() function and next() together.
-      // on server side redirect() handles navigation but if next() is not called after,
-      // it does not work and stuck on same page.
-      redirect('/login');
-      next();
-      return false; // return false and stop chaining because next is used.
+      // if user not signed in
+      next('/login');
+      return false; // Stop chaining because NEXT is used.
    }
-);
+
+   // if not client, it is server
+   const authorization = request.headers.authorization;
+   const isOK = CheckUserTokenAndReturnFalseOrTrue(authorization);
+   if (isOk) return true; // token is correct, return true to continue chaining
+
+   // In server side we have to use redirect() function and next() together.
+   // on server side redirect() handles navigation but if next() is not called after,
+   // it does not work and stuck on same page.
+   redirect('/login');
+   next();
+   return false; // return false and stop chaining because next is used.
+});
 ```
 
 ### Creating Middleware Handler
@@ -179,6 +176,27 @@ const routes = [
 ];
 ```
 
+### Typed Custom Properties
+
+You can create your own types for properties inside middlewares.
+
+##### middlewares.d.ts
+
+This file should `ALWAYS!` import something or export something. If no import or export provided this will break all types.
+
+```ts
+//or import something
+import { App } from 'vue';
+
+declare module 'vite-ssr-middleware' {
+   interface CustomProperties {
+      propertyForMiddleware: string;
+   }
+}
+// a garbage type just to make this file as a module.
+export type Integer = number;
+```
+
 ### Importing Middlewares Dynamically
 
 Thanks to vite's `import.meta.globEager` function we can import files inside a directory so we won't import middlewares by hand.
@@ -209,9 +227,7 @@ export default viteSSR(App, { routes }, (context) => {
     * }
     */
    const midwareGlob = import.meta.globEager('./middlewares/*.ts');
-   const middlewares: Middleware[] = Object.keys(midwareGlob).map(
-      (key) => midwareGlob[key].default
-   );
+   const middlewares: Middleware[] = Object.keys(midwareGlob).map((key) => midwareGlob[key].default);
    const handler = middlewareHandler(context, middlewares);
    router.beforeEach(handler);
 });
